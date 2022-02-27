@@ -4,8 +4,16 @@
   "description": "Сервер для сайта-скелета (первая попытка 27.02.2022 17:03)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
-  "author": "",
-  "license": "ISC"
+  "type": "module",
+  "author": "bourbakiii",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
 }
