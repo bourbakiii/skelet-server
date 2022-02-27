@@ -17,4 +17,5 @@ const Post = new mongoose.Schema({
         type:String
     }
 });
-export default mongoose.model(Post);
+ 
+export default mongoose.model('Post',Post);
