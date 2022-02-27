@@ -1,0 +1,11 @@
+{
+  "name": "skelet-server",
+  "version": "1.0.0",
+  "description": "Сервер для сайта-скелета (первая попытка 27.02.2022 17:03)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
