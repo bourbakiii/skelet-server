@@ -21,16 +21,16 @@ class UserController {
      login(req, res) {
         try {
             const { email, password } = req.body;
-            const the_user =  User.find({ "email":email });
-            console.log(the_user.schema.object);
+            const the_user =  User.findOne({ "email":email });
+            console.log({email,password});
+            console.log(the_user.name);
             // if(the_user){
             //     console.log(the_user.email);
             // }
             // else{
             //     console.log("Почему не работате");
             // }
-            // const user = await User.login({ email, password });
-            // res.status(200).json(user);
+            res.status(200);
         } catch (error) {
             console.log("User login error:");
             console.log(error);
