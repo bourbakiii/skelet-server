@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import mongoose_bcrypt from 'mongoose-bcrypt';
+
 const { Schema } = mongoose;
 var validateEmail = function(email) {
     var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -27,6 +29,11 @@ const User = new Schema({
         required: [true, "Email является обязательным полем"],
         validate: [validateEmail, 'Email заполнен неправильно'],
     },
+    password:{
+        type: String,
+        required: [true, "Пароль является обязательным полем"],
+        bcrypt: true
+    },
     token:{
         type: String,
         default: null
@@ -36,7 +43,6 @@ const User = new Schema({
         default: false
     }
 });
-User.pre('save',()=>{
-    console.log('Предсохранение пользователя');
-})
+User.plugin(mongoose_bcrypt);
+
 export default mongoose.model('User', User);

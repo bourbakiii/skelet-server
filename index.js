@@ -6,7 +6,7 @@ const PORT = 5000;
 const DB_URL = `mongodb+srv://bourbakiii:8236251@cluster0.vqwrn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
 `;
 
-const app = express().use(express.json()).use('/api', product_router).use('/api', user_router); 
+const app = express().use(express.json()).use('/api', [product_router,user_router]); 
 
 
   (async function startApp() {
