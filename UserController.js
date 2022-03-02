@@ -1,7 +1,12 @@
 import User from "./User.js";
 import mongoose_bcrypt from 'mongoose-bcrypt';
+let alphabet = 'QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789';
 
-
+function get_aphabet(length) {
+    let letter = "";
+    for (let i = 0; i < length; i++) letter += alphabet[Math.floor(Math.random() * alphabet.length)];
+    return letter;
+}
 class UserController {
     async create(req, res) {
         try {
@@ -19,13 +24,16 @@ class UserController {
     async login(req, res) {
         try {
             const { email, password } = req.body;
-            User.findOne({ email}, function (err, user) {
-                if (err) return res.status(500).json({message:'Возникла ошибка, попробуйте позже'});
+            User.findOne({ email }, (err, user) => {
+                if (err) return res.status(500).json({ message: 'Возникла ошибка, попробуйте позже' });
                 if (!user) return res.status(404).json({ message: "Неверный адрес электронной почты и/или пароль" })
-                user.verifyPassword(password, function (err, valid) {
+                user.verifyPassword(password, (err, valid) => {
                     if (err) return res.status(500).json('Возникла ошибка, попробуйте позже');
-                    else if (valid) 
-                         return res.status(200).json(user);
+                    else if (valid) {
+                        user.token = get_aphabet(35);
+                        user.save();
+                        return res.status(200).json(user);
+                    }
                     else return res.status(404).json({ message: "Неверный адрес электронной почты и/или пароль" })
                 })
             });
@@ -39,6 +47,20 @@ class UserController {
         try {
             const users = await User.find();
             return res.json(users);
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    }
+    async getOne(req, res) {
+        try {
+            if (!req.headers.authorization) return res.status(403).json({ message: "Токен не передан" });
+            const token = req.headers.authorization.substring(7, 100);
+            const who_questions = User.findOne({ token: token, permission: 'user' }, (err, user) => { 
+                if(err) res.status(500).json(error);
+                if (!user) return res.status(403).json({ message: "В доступеп отказано" });
+                return res.status(403).json({ message: "В доступеп отказано" });
+            } );
+            res.status(200).json({message:'Founded'});
         } catch (error) {
             res.status(500).json(error);
         }

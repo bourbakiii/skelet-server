@@ -41,6 +41,11 @@ const User = new Schema({
     verification:{
         type: Boolean,
         default: false
+    },
+    permission:{
+        type: String,
+        default: "user",
+        enum: ["user","manager","admin"]
     }
 });
 User.methods.toJSON = function() {
