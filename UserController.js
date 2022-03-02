@@ -16,13 +16,19 @@ class UserController {
             res.status(500).json(error);
         }
     }
-    login(req, res) {
+    async login(req, res) {
         try {
             const { email, password } = req.body;
-            User.findOne({ "email": email },(error, user)=>{
-                
-            })
-            res.json(User.find());
+            User.findOne({ email}, function (err, user) {
+                if (err) return res.status(500).json({message:'Возникла ошибка, попробуйте позже'});
+                if (!user) return res.status(404).json({ message: "Неверный адрес электронной почты и/или пароль" })
+                user.verifyPassword(password, function (err, valid) {
+                    if (err) return res.status(500).json('Возникла ошибка, попробуйте позже');
+                    else if (valid) 
+                         return res.status(200).json(user);
+                    else return res.status(404).json({ message: "Неверный адрес электронной почты и/или пароль" })
+                })
+            });
         } catch (error) {
             console.log("User login error:");
             console.log(error);
@@ -31,12 +37,12 @@ class UserController {
     }
     async getAll(req, res) {
         try {
-          const users = await User.find();
-          return res.json(users);
+            const users = await User.find();
+            return res.json(users);
         } catch (error) {
-          res.status(500).json(error);
+            res.status(500).json(error);
         }
-      }
+    }
 }
 
 export default new UserController();

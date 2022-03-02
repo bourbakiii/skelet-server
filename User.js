@@ -43,6 +43,12 @@ const User = new Schema({
         default: false
     }
 });
+User.methods.toJSON = function() {
+    var user = this.toObject();
+    delete user.password;
+    delete user['__v'];
+    return user;
+   }
 User.plugin(mongoose_bcrypt);
 
 export default mongoose.model('User', User);
