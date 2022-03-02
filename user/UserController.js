@@ -74,24 +74,10 @@ class UserController {
   }
   async getOne(req, res) {
     try {
-    //   const token = req.headers.authorization.substring(7, 100);
-    //   let user = await User.find({ token, permission: "user" }).exec();
-    //     return res.status(200).json(user).send();
-    //   console.log("Сюда не дошел");
-      //   // return res.status(403).json(user);
-      //   console.log(user);
-      //   if (!req.headers.authorization)
-      //     return res.status(403).json({ message: "Токен не передан" });
-      //   const who_questions = User.findOne(
-      //     { token: token, permission: "user" },
-      //     (err, user) => {
-      //       if (err) res.status(500).json(error);
-      //       if (!user)
-      //         return res.status(403).json({ message: "В доступеп отказано" });
-      //       return res.status(403).json({ message: "В доступеп отказано" });
-      //     }
-      //   );
-      //   res.status(200).json({ message: "Founded" });
+      const {id} = req.params;
+      if(!id) return res.status(422).json({"message":"ID пользователя не передан"});
+      let user = await User.findOne({id});
+      return res.status(200).json(user);
     } catch (error) {
       res.status(500).json(error);
     }
