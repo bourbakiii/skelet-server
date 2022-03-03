@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 import mongoose_bcrypt from 'mongoose-bcrypt';
-
 const { Schema } = mongoose;
 const validateEmail = email=> {
     let re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     return re.test(email)
 };
+
+
 const User = new Schema({
     image: {
         type: String,
@@ -48,6 +49,8 @@ const User = new Schema({
         enum: ["user","manager","admin"]
     }
 });
+
+
 User.methods.toJSON = function() {
     var user = this.toObject();
     delete user.password;

@@ -1,4 +1,5 @@
 import User from "./User.js";
+import Code from "../code/Code.js";
 import mongoose_bcrypt from "mongoose-bcrypt";
 import nodemailer from 'nodemailer';
 
@@ -35,13 +36,14 @@ class UserController {
         email,
         password,
       });
-      let new_code = 
+      let code = get_aphabet(5);
+      Code.create({ user_email: email, code });
       await transporter.sendMail({
         from: 'Сайт-скелет',
         to: email,
         subject: 'Ваш код для верификации на сайте-скелете:',
         html:
-          `Ваш <i>код</i>:<h3>${get_aphabet(5)}'</h3>
+          `Ваш <i>код</i>:<h3>${code}'</h3>
           <br/> (внешний вид письма будет на выбор заказчика)`,
       })
       return res.status(200).json(user);
@@ -96,6 +98,17 @@ class UserController {
       if (!id) return res.status(422).json({ "message": "ID пользователя не передан" });
       let user = await User.findOne({ id });
       return res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      if (!id) return res.status(422).json({ "message": "ID пользователя не передан" });
+      await User.findByIdAndDelete(id).then(()=>{
+        res.status(200).send()
+      });
     } catch (error) {
       res.status(500).json(error);
     }
