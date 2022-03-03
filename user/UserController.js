@@ -1,6 +1,15 @@
 import User from "./User.js";
 import mongoose_bcrypt from "mongoose-bcrypt";
+import nodemailer from 'nodemailer';
+
 let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'gabisov05@gmail.com',
+    pass: '8236251telef',
+  },
+});
 
 function get_aphabet(length) {
   let letter = "";
@@ -14,7 +23,7 @@ class UserController {
       const { image, name, surname, father_name, email, password } = req.body;
       const founded = await User.findOne({ email: email }).exec();
       if (founded)
-        res.status(409).json({
+        return res.status(409).json({
           message:
             "Пользователь с таким адресом электронной почты уже зарегистрирован",
         });
@@ -26,11 +35,20 @@ class UserController {
         email,
         password,
       });
-      res.status(200).json(user);
+      let new_code = 
+      await transporter.sendMail({
+        from: 'Сайт-скелет',
+        to: email,
+        subject: 'Ваш код для верификации на сайте-скелете:',
+        html:
+          `Ваш <i>код</i>:<h3>${get_aphabet(5)}'</h3>
+          <br/> (внешний вид письма будет на выбор заказчика)`,
+      })
+      return res.status(200).json(user);
     } catch (error) {
       console.log("User create error:");
       console.log(error);
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
   async login(req, res) {
@@ -61,7 +79,7 @@ class UserController {
     } catch (error) {
       console.log("User login error:");
       console.log(error);
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
   async getAll(req, res) {
@@ -74,9 +92,9 @@ class UserController {
   }
   async getOne(req, res) {
     try {
-      const {id} = req.params;
-      if(!id) return res.status(422).json({"message":"ID пользователя не передан"});
-      let user = await User.findOne({id});
+      const { id } = req.params;
+      if (!id) return res.status(422).json({ "message": "ID пользователя не передан" });
+      let user = await User.findOne({ id });
       return res.status(200).json(user);
     } catch (error) {
       res.status(500).json(error);

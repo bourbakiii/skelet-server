@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 import mongoose_bcrypt from 'mongoose-bcrypt';
 
 const { Schema } = mongoose;
-var validateEmail = function(email) {
-    var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+const validateEmail = email=> {
+    let re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     return re.test(email)
 };
 const User = new Schema({
