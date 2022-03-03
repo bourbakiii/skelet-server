@@ -1,12 +1,16 @@
 import cors from 'cors';
 import express from "express";
+import fileUpload from 'express-fileupload';
 import mongoose from "mongoose";
 import product_router from './product/product_router.js';
-import user_router from './user/user_router.js';
+import user_router from './user/user_router.js'
+import { dirname } from 'path';
 const PORT = 5000;
 const DB_URL = `mongodb+srv://bourbakiii:8236251@cluster0.vqwrn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const app = express().use('/api', [
   express.json(),
+  express.static(`${dirname}/static`),
+  fileUpload({}),
   cors({
     origin: 'http://localhost:3000'
   }),
