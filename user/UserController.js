@@ -105,10 +105,10 @@ class UserController {
     }
   }
   async upload(req, res) {
-    const { image } = req.body;
-    if (!image) res.status(422).json({ message: "Image doenst given" });
+    // if (!image) res.status(422).json({ message: "Image doenst given" });
     console.log("the image is");
-    console.log(image);
+    console.log(req.files);
+    return res.status(200).send();
   }
 }
 
