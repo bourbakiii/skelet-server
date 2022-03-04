@@ -2,7 +2,7 @@ import User from "./User.js";
 import Code from "../code/Code.js";
 import mongoose_bcrypt from "mongoose-bcrypt";
 import nodemailer from 'nodemailer';
-
+import FileService from '../services/FilesService.js';
 let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -105,9 +105,8 @@ class UserController {
     }
   }
   async upload(req, res) {
-    // if (!image) res.status(422).json({ message: "Image doenst given" });
-    console.log("the image is");
-    console.log(req.files);
+    if(!req.files.image) res.status(422).json({ message: "Image doenst given" });
+    FileService.save(req.files.image);
     return res.status(200).send();
   }
 }
