@@ -8,8 +8,10 @@ router.get("/user", UserController.login);
 router.get("/users", permission_middleware, UserController.getAll);
 router.get("/user/:id", permission_middleware, UserController.getOne);
 router.delete("/user/:id",  UserController.delete);
-// router.get("/products/:id", ProductController.getOne);
-// router.put("/products", ProductController.update);
-// router.delete("/products/:id", ProductController.delete);
+
+
+// ?router.get("/products/:id", ProductController.getOne);
+// ?router.put("/products", ProductController.update);
+// ?router.delete("/products/:id", ProductController.delete);
 
 export default router;
