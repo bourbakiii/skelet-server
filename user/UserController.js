@@ -111,12 +111,14 @@ class UserController {
     try {
       const { id } = req.params;
       if (!id) return res.status(422).json({ message: "ID пользователя не передан" });
-      let user =  User.findById(id);
-      if (!user) return res.status(500).json({'message':`Пользователь не найден`});
-      User.deleteOne({ email: user.email }, (error) => {
-          if (error) throw { message: "Ошибка при удалении пользователя" };
+      User.findOne({_id: id}).exec(function(err, user){
+        if(err) throw {message:'При удалении пользователя вощникла проблема'};
+        if(!user)
+          throw {message:'Пользователь не найден'};
+          console.log('founded');
         });
-      return res.status(200).json({'message':'deleted'});
+        
+      // return res.status(200).json({'message':'deleted'});
     } catch (error) {
       res.status(500).json(error);
     }
