@@ -9,12 +9,13 @@ class FileService {
   }
   delete(name, directory) {
     try {
-      fs.unlink(directory + name, (err) => {
-        if (err) throw { message: "Ошибка при удалении файла", error };
+      fs.unlink(`static/${directory}/${name}`, (error) => {
+        if (error) throw { message: "Ошибка при удалении файла", error };
       });
     } catch (error) {
       console.log("File removing error: ");
       console.log(error);
+      return error;
     }
   }
 }

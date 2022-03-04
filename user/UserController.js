@@ -4,6 +4,7 @@ import mongoose_bcrypt from "mongoose-bcrypt";
 import nodemailer from "nodemailer";
 import FileService from "../services/FilesService.js";
 import * as fs from "fs";
+import { Console } from "console";
 let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
 let transporter = nodemailer.createTransport({
   service: "gmail",
@@ -30,7 +31,7 @@ class UserController {
             "Пользователь с таким адресом электронной почты уже зарегистрирован",
         });
       let image_name = "placeholder.png";
-      if (req.files["image"]) {
+      if (req.files && req.files["image"]) {
         image_name = FileService.save(req.files["image"]);
       }
       const user = await User.create({
@@ -112,15 +113,17 @@ class UserController {
       const { id } = req.params;
       if (!id) return res.status(422).json({ message: "ID пользователя не передан" });
       User.findOne({_id: id}).exec(function(err, user){
-        if(err) throw {message:'При удалении пользователя вощникла проблема'};
-        if(!user)
-          throw {message:'Пользователь не найден'};
-          console.log('founded');
+        if(err) throw {message:'При удалении пользователя возникла проблема'};
+        if(!user) throw {message:'Пользователь не найден'};
+        FileService.delete(user.image,'images');
+        User.findByIdAndDelete(user.id);
+      return res.status(200);
         });
-        
-      // return res.status(200).json({'message':'deleted'});
-    } catch (error) {
-      res.status(500).json(error);
+        return res.status(200);
+      } catch (error) {
+      console.log("User deleting error:");
+      console.log(error);
+      res.status(500).json(Object.assign(error,{message:"Ошибка при удалении пользователя"}));
     }
   }
   async update(req, res) {
