@@ -1,14 +1,15 @@
 import User from "./User.js";
 import Code from "../code/Code.js";
 import mongoose_bcrypt from "mongoose-bcrypt";
-import nodemailer from 'nodemailer';
-import FileService from '../services/FilesService.js';
+import nodemailer from "nodemailer";
+import FileService from "../services/FilesService.js";
+import * as fs from "fs";
 let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
 let transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-    user: 'gabisov05@gmail.com',
-    pass: '8236251telef',
+    user: "gabisov05@gmail.com",
+    pass: "8236251telef",
   },
 });
 
@@ -21,16 +22,19 @@ function get_aphabet(length) {
 class UserController {
   async create(req, res) {
     try {
-      const { image, name, surname, father_name, email, password } = req.body;
-
+      const { name, surname, father_name, email, password } = req.body;
       const founded = await User.findOne({ email: email }).exec();
       if (founded)
         return res.status(409).json({
           message:
             "Пользователь с таким адресом электронной почты уже зарегистрирован",
         });
+      let image_name = "placeholder.png";
+      if (req.files["image"]) {
+        image_name = FileService.save(req.files["image"]);
+      }
       const user = await User.create({
-        image,
+        image: image_name,
         name,
         surname,
         father_name,
@@ -40,13 +44,12 @@ class UserController {
       let code = get_aphabet(5);
       Code.create({ user_email: email, code });
       await transporter.sendMail({
-        from: 'Сайт-скелет',
+        from: "Сайт-скелет",
         to: email,
-        subject: 'Ваш код для верификации на сайте-скелете:',
-        html:
-          `Ваш <i>код</i>:<h3>${code}'</h3>
+        subject: "Ваш код для верификации на сайте-скелете:",
+        html: `Ваш <i>код</i>:<h3>${code}'</h3>
           <br/> (внешний вид письма будет на выбор заказчика)`,
-      })
+      });
       return res.status(200).json(user);
     } catch (error) {
       console.log("User create error:");
@@ -104,10 +107,32 @@ class UserController {
       res.status(500).json(error);
     }
   }
-  async upload(req, res) {
-    if(!req.files.image) res.status(422).json({ message: "Image doenst given" });
-    FileService.save(req.files.image);
-    return res.status(200).send();
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      if (!id) return res.status(422).json({ message: "ID пользователя не передан" });
+      let user =  User.findById(id);
+      if (!user) return res.status(500).json({'message':`Пользователь не найден`});
+      User.deleteOne({ email: user.email }, (error) => {
+          if (error) throw { message: "Ошибка при удалении пользователя" };
+        });
+      return res.status(200).json({'message':'deleted'});
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+  async update(req, res) {
+    try {
+      const { name, surname, father_name, email, password } = req.body;
+      const founded = await User.findOne(
+        { email: email },
+        (error, user) => {}
+      ).exec();
+    } catch (error) {
+      console.log("User update error");
+      console.log(error);
+      return res.code(500).json(error);
+    }
   }
 }
 

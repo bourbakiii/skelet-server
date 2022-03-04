@@ -1,13 +1,12 @@
 import mongoose from "mongoose";
 import mongoose_bcrypt from 'mongoose-bcrypt';
-const { Schema } = mongoose;
 const validateEmail = email=> {
     let re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     return re.test(email)
 };
 
 
-const User = new Schema({
+const User = new mongoose.Schema({
     image: {
         type: String,
         required: false,
@@ -58,5 +57,6 @@ User.methods.toJSON = function() {
     return user;
    }
 User.plugin(mongoose_bcrypt);
+
 
 export default mongoose.model('User', User);

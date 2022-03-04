@@ -1,6 +1,5 @@
 import cors from "cors";
 import express from "express";
-import fileUpload from "express-fileupload";
 import mongoose from "mongoose";
 import product_router from "./product/product_router.js";
 import user_router from "./user/user_router.js";
@@ -17,6 +16,7 @@ app.use(
 );
 app.use("/api", user_router);
 app.use("/api", product_router);
+
 
 (async function startApp() {
   try {
