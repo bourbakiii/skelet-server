@@ -22,6 +22,7 @@ class UserController {
   async create(req, res) {
     try {
       const { image, name, surname, father_name, email, password } = req.body;
+
       const founded = await User.findOne({ email: email }).exec();
       if (founded)
         return res.status(409).json({
@@ -95,23 +96,19 @@ class UserController {
   async getOne(req, res) {
     try {
       const { id } = req.params;
-      if (!id) return res.status(422).json({ "message": "ID пользователя не передан" });
+      if (!id)
+        return res.status(422).json({ message: "ID пользователя не передан" });
       let user = await User.findOne({ id });
       return res.status(200).json(user);
     } catch (error) {
       res.status(500).json(error);
     }
   }
-  async delete(req, res) {
-    try {
-      const { id } = req.params;
-      if (!id) return res.status(422).json({ "message": "ID пользователя не передан" });
-      await User.findByIdAndDelete(id).then(()=>{
-        res.status(200).send()
-      });
-    } catch (error) {
-      res.status(500).json(error);
-    }
+  async upload(req, res) {
+    const { image } = req.body;
+    if (!image) res.status(422).json({ message: "Image doenst given" });
+    console.log("the image is");
+    console.log(image);
   }
 }
 
