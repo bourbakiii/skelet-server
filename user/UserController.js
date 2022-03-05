@@ -113,23 +113,19 @@ class UserController {
       const { id } = req.params;
       if (!id)
         return res.status(422).json({ message: "ID пользователя не передан" });
-      User.findOne({ _id: id }).exec(function (err, user) {
-        if (err) return res.json({
-            message: "При удалении пользователя возникла ошибка",
-          });
-        if (!user) return res.json({ message: "Пользователь не найден" });
-        User.findByIdAndDelete(user.id, (error) => {
-          if (error) {
-            console.log("User deleting error:");
-            console.log(error);
-            return res.json({
-              message: "При удалении пользователя возникла ошибка",
-            });
-          }
-          if (user.image != null) FileService.delete(user.image, "images");
-          return res.status(200).send();
-        });
-      });
+      let user = await User.findByIdAndDelete(id).exec();
+      if(user.image != null) FileService.delete(user.image,"images");
+      // await User.findOne({ id: id }, (err, user) => {
+      //   if (err)
+      //     return res.json({
+      //       message: "При удалении пользователя возникла ошибка",
+      //     });
+      //   if (!user) return res.json({ message: "Пользователь не найден" });
+      //   if (user.image != null) FileService.delete(user.image, "images");
+      // })
+        // .deleteOne({ id: id })
+        // .exec();
+      return res.status(200).send();
     } catch (error) {
       console.log("User deleting error:");
       console.log(error);
