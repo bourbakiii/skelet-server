@@ -1,10 +1,7 @@
 import User from "./User.js";
 import Code from "../code/Code.js";
-import mongoose_bcrypt from "mongoose-bcrypt";
 import nodemailer from "nodemailer";
 import FileService from "../services/FilesService.js";
-import * as fs from "fs";
-import { Console } from "console";
 let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
 let transporter = nodemailer.createTransport({
   service: "gmail",
@@ -51,6 +48,32 @@ class UserController {
         html: `Ваш <i>код</i>:<h3>${code}'</h3>
           <br/> (внешний вид письма будет на выбор заказчика)`,
       });
+      return res.status(200).json(user);
+    } catch (error) {
+      console.log("User create error:");
+      console.log(error);
+      return res.status(500).json(error);
+    }
+  }
+  async update(req, res) {
+    try {
+      const { id, name, surname, father_name, email } = req.body;
+      let user = await User.findByIdAndUpdate(id, {
+        name,
+        surname,
+        father_name,
+        email,
+      }).catch((error) => {
+        return res
+          .status(404)
+          .json({ message: "Пользователь не найден", error });
+      });
+      if (user && req.files && req.files["image"]) {
+        console.log("зачем ты еще тут");
+        if (user.image != null) FileService.delete(user.image, "images");
+        user.image = FileService.save(req.files["image"], "images");
+        user.save();
+      }
       return res.status(200).json(user);
     } catch (error) {
       console.log("User create error:");
@@ -108,23 +131,14 @@ class UserController {
       res.status(500).json(error);
     }
   }
+
   async delete(req, res) {
     try {
       const { id } = req.params;
       if (!id)
         return res.status(422).json({ message: "ID пользователя не передан" });
       let user = await User.findByIdAndDelete(id).exec();
-      if(user.image != null) FileService.delete(user.image,"images");
-      // await User.findOne({ id: id }, (err, user) => {
-      //   if (err)
-      //     return res.json({
-      //       message: "При удалении пользователя возникла ошибка",
-      //     });
-      //   if (!user) return res.json({ message: "Пользователь не найден" });
-      //   if (user.image != null) FileService.delete(user.image, "images");
-      // })
-        // .deleteOne({ id: id })
-        // .exec();
+      if (user.image != null) FileService.delete(user.image, "images");
       return res.status(200).send();
     } catch (error) {
       console.log("User deleting error:");
@@ -134,19 +148,6 @@ class UserController {
         .json(
           Object.assign(error, { message: "Ошибка при удалении пользователя" })
         );
-    }
-  }
-  async update(req, res) {
-    try {
-      const { name, surname, father_name, email, password } = req.body;
-      const founded = await User.findOne(
-        { email: email },
-        (error, user) => {}
-      ).exec();
-    } catch (error) {
-      console.log("User update error");
-      console.log(error);
-      return res.code(500).json(error);
     }
   }
 }
