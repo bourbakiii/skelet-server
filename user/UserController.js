@@ -30,7 +30,7 @@ class UserController {
           message:
             "Пользователь с таким адресом электронной почты уже зарегистрирован",
         });
-      let image_name = "placeholder.png";
+      let image_name = null;
       if (req.files && req.files["image"]) {
         image_name = FileService.save(req.files["image"]);
       }
@@ -111,19 +111,33 @@ class UserController {
   async delete(req, res) {
     try {
       const { id } = req.params;
-      if (!id) return res.status(422).json({ message: "ID пользователя не передан" });
-      User.findOne({_id: id}).exec(function(err, user){
-        if(err) throw {message:'При удалении пользователя возникла проблема'};
-        if(!user) throw {message:'Пользователь не найден'};
-        FileService.delete(user.image,'images');
-        User.findByIdAndDelete(user.id);
-      return res.status(200);
+      if (!id)
+        return res.status(422).json({ message: "ID пользователя не передан" });
+      User.findOne({ _id: id }).exec(function (err, user) {
+        if (err) return res.json({
+            message: "При удалении пользователя возникла ошибка",
+          });
+        if (!user) return res.json({ message: "Пользователь не найден" });
+        User.findByIdAndDelete(user.id, (error) => {
+          if (error) {
+            console.log("User deleting error:");
+            console.log(error);
+            return res.json({
+              message: "При удалении пользователя возникла ошибка",
+            });
+          }
+          if (user.image != null) FileService.delete(user.image, "images");
+          return res.status(200).send();
         });
-        return res.status(200);
-      } catch (error) {
+      });
+    } catch (error) {
       console.log("User deleting error:");
       console.log(error);
-      res.status(500).json(Object.assign(error,{message:"Ошибка при удалении пользователя"}));
+      res
+        .status(500)
+        .json(
+          Object.assign(error, { message: "Ошибка при удалении пользователя" })
+        );
     }
   }
   async update(req, res) {
