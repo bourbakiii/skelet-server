@@ -1,19 +1,15 @@
 import mongoose from "mongoose";
-import ttl from "mongoose-ttl";
-const validateEmail = email=> {
-    let re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    return re.test(email)
-};
+import ttl from 'mongoose-ttl';
+
 const Code = new mongoose.Schema({
-    user_email: {
+    user_id: {
         type: String,
-        required: [true, "Email не передан"],
-        validate: [validateEmail, 'Email заполнен неправильно'],
+        required: [true, "ID не передан"],
     },
     code:{
         type: String,
         required: [true, "Code не передан"],
     },
 });
-Code.plugin(ttl, { ttl: '5s' });
+Code.plugin(ttl, { ttl: '10m' });
 export default mongoose.model("Code",Code);

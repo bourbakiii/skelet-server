@@ -40,7 +40,7 @@ class UserController {
         password,
       });
       let code = get_aphabet(5);
-      Code.create({ user_email: email, code });
+      Code.create({ user_id: user.id, code });
       await transporter.sendMail({
         from: "Сайт-скелет",
         to: email,
@@ -131,7 +131,6 @@ class UserController {
       res.status(500).json(error);
     }
   }
-
   async delete(req, res) {
     try {
       const { id } = req.params;
@@ -148,6 +147,26 @@ class UserController {
         .json(
           Object.assign(error, { message: "Ошибка при удалении пользователя" })
         );
+    }
+  }
+  async verify(req, res) {
+    try {
+      const id = req.params.id;
+      
+      let user = await User.findByIdAndUpdate(id, { verification: true }).exec()
+        .then(() => {
+          return res.status(200).send();
+        })
+        .catch((error) => {
+          return res
+            .status(500)
+            .json({ message: `Не удалось верифицировать пользователя`, error })
+            .send();
+        });
+    } catch (error) {
+      console.log("User verify error:");
+      console.log(error);
+      return res.status(500).json(error);
     }
   }
 }
