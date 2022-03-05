@@ -15,6 +15,9 @@ class ProductController {
   async getAll(req, res) {
     try {
       const products = await Product.find();
+      products.forEach(async element => {
+        // !!! При возвращении чтобы сами категории раскрывались
+      });
       return res.json(products);
     } catch (error) {
       res.status(500).json(error);
