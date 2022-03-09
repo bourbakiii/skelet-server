@@ -1,3 +1,4 @@
+import Category from "../category/Category.js";
 import Product from "./Product.js";
 
 class ProductController {
@@ -27,7 +28,13 @@ class ProductController {
     } catch (error) {
       console.log("Product create error:");
       console.log(error);
-      res.status(500).json(error);
+      res
+        .status(500)
+        .json({
+          success: false,
+          message: "Не удалось добавить продукт, попробуйте позже",
+          data: error,
+        });
     }
   }
   async getAll(req, res) {

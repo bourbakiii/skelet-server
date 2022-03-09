@@ -8,7 +8,7 @@ const User = new mongoose.Schema({
     image: {
         type: String,
         required: false,
-        default: null
+        default: "user-placeholder.png"
     },
     name: {
         type: String, 

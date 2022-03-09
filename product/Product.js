@@ -5,7 +5,7 @@ const Product = new mongoose.Schema({
   image: {
     type: String,
     required: false,
-    default: null,
+    default: 'product-placeholder.png',
   },
   name: {
     type: String,
@@ -37,4 +37,9 @@ const Product = new mongoose.Schema({
   categories: [{type: mongoose.Schema.Types.ObjectId, ref: 'Category'}],
 });
 
+Product.methods.toJSON = function(){
+    let product = this.toObject();
+    delete product['__v'];
+     return product;
+}
 export default mongoose.model("Product", Product);

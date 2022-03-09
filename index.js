@@ -8,6 +8,7 @@ const PORT = 5000;
 const DB_URL = `mongodb+srv://bourbakiii:8236251@cluster0.vqwrn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const app = express();
 app.use(express.json());
+app.use(express.static('static'));
 app.use(
   cors({
     origin: "http://localhost:3000",
