@@ -115,7 +115,6 @@ class UserController {
         if(err) throw {message:'При удалении пользователя вощникла проблема'};
         if(!user)
           throw {message:'Пользователь не найден'};
-          console.log('founded');
         });
         
       // return res.status(200).json({'message':'deleted'});

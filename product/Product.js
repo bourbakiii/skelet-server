@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Category from "../";
 const { Schema } = mongoose;
 const Product = new Schema({
     image: {
@@ -34,5 +35,14 @@ const Product = new Schema({
         required: [true, "Количество является обязательным полем"]
     }
 });
-
+Product.methods.toJSON = function() {
+    var product = this.toObject();
+    delete product['__v'];
+    let categories = product.categories;
+    product.categories = [];
+    categories.forEach(element => {
+        element = Category.findById(element);
+    });
+    return product;
+   }
 export default mongoose.model('Product', Product);
