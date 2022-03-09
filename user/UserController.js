@@ -45,7 +45,7 @@ class UserController {
         from: "Сайт-скелет",
         to: email,
         subject: "Ваш код для верификации на сайте-скелете:",
-        html: `Ваш <i>код</i>:<h3>${code}'</h3>
+        html: `Ваш <i>код</i>:<h3>${code}</h3>
           <br/> (внешний вид письма будет на выбор заказчика)`,
       });
       user.token = get_aphabet(35);

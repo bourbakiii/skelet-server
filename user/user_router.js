@@ -1,5 +1,6 @@
 import Router from "express";
 import UserController from "./UserController.js";
+import ResetController from "./ResetController.js";
 import permission_middleware from "../middleware/token_permission.js";
 import token_middewaware from "../middleware/token_user.js";
 import action_code_middleware from "../middleware/action_code.js";
@@ -15,6 +16,8 @@ router.get("/users", permission_middleware, UserController.getAll);
 router.put("/user/:id", token_middewaware, action_code_middleware, UserController.verify);
 router.get("/user/:id", permission_middleware, UserController.getOne);
 router.delete("/user/:id", UserController.delete);
+router.get("/reset/send", ResetController.send);
+router.post("/reset/check", ResetController.check);
 
 // ?router.get("/products/:id", ProductController.getOne);
 // ?router.delete("/products/:id", ProductController.delete);
