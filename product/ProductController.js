@@ -3,8 +3,16 @@ import Product from "./Product.js";
 class ProductController {
   async create(req, res) {
     try {
-      const { image, name, description, price, discount_price, active, stock } =
-        req.body;
+      const {
+        image,
+        name,
+        description,
+        price,
+        discount_price,
+        active,
+        stock,
+        categories,
+      } = req.body;
       const product = await Product.create({
         image,
         name,
@@ -13,6 +21,7 @@ class ProductController {
         discount_price,
         active,
         stock,
+        categories,
       });
       res.status(200).json(product);
     } catch (error) {
@@ -23,7 +32,10 @@ class ProductController {
   }
   async getAll(req, res) {
     try {
-      const products = await Product.find();
+      const products = await Product.find().populate({
+        path: "categories",
+        select: "name",
+      });
       return res.json(products);
     } catch (error) {
       res.status(500).json(error);
@@ -35,11 +47,12 @@ class ProductController {
       if (!id)
         return res.status(500).json({ message: "ID продукта не указан" });
       Product.findById(id)
+        .populate({ path: "categories", select: "name" })
         .exec()
-        .then((product) => {
+        .then(async (product) => {
           return res.status(200).json({
             success: false,
-            message: "Продукта найден",
+            message: "Продукт найден",
             data: product,
           });
         })

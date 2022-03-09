@@ -1,4 +1,3 @@
-import e from "express";
 import mongoose from "mongoose";
 import Category from "../category/Category.js";
 
@@ -35,20 +34,7 @@ const Product = new mongoose.Schema({
     min: [0, "Вы не можете добавить отрицательное количество продукта"],
     required: [true, "Количество является обязательным полем"],
   },
-  categories: { type: Array, default: ["6223c15dd905421b5377f436"] },
+  categories: [{type: mongoose.Schema.Types.ObjectId, ref: 'Category'}],
 });
-
-Product.methods.toJSON = function () {
-  let product = this.toObject();
-  let categories = product.categories;
-  product.categories = null;
-  categories.forEach(async element => {
-      element = await Category.findById(element).exec();
-  });
-  console.log("The categories is");
-  console.log(categories);
-  delete product.__v;
-  return product;
-};
 
 export default mongoose.model("Product", Product);
