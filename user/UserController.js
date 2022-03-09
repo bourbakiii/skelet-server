@@ -1,9 +1,7 @@
 import User from "./User.js";
 import Code from "../code/Code.js";
-import mongoose_bcrypt from "mongoose-bcrypt";
 import nodemailer from "nodemailer";
 import FileService from "../services/FilesService.js";
-import * as fs from "fs";
 let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
 let transporter = nodemailer.createTransport({
   service: "gmail",
@@ -29,8 +27,8 @@ class UserController {
           message:
             "Пользователь с таким адресом электронной почты уже зарегистрирован",
         });
-      let image_name = "placeholder.png";
-      if (req.files["image"]) {
+      let image_name = null;
+      if (req.files && req.files["image"]) {
         image_name = FileService.save(req.files["image"]);
       }
       const user = await User.create({
@@ -42,7 +40,7 @@ class UserController {
         password,
       });
       let code = get_aphabet(5);
-      Code.create({ user_email: email, code });
+      Code.create({ user_id: user.id, code });
       await transporter.sendMail({
         from: "Сайт-скелет",
         to: email,
@@ -50,6 +48,32 @@ class UserController {
         html: `Ваш <i>код</i>:<h3>${code}'</h3>
           <br/> (внешний вид письма будет на выбор заказчика)`,
       });
+      return res.status(200).json(user);
+    } catch (error) {
+      console.log("User create error:");
+      console.log(error);
+      return res.status(500).json(error);
+    }
+  }
+  async update(req, res) {
+    try {
+      const { id, name, surname, father_name, email } = req.body;
+      let user = await User.findByIdAndUpdate(id, {
+        name,
+        surname,
+        father_name,
+        email,
+      }).catch((error) => {
+        return res
+          .status(404)
+          .json({ message: "Пользователь не найден", error });
+      });
+      if (user && req.files && req.files["image"]) {
+        console.log("зачем ты еще тут");
+        if (user.image != null) FileService.delete(user.image, "images");
+        user.image = FileService.save(req.files["image"], "images");
+        user.save();
+      }
       return res.status(200).json(user);
     } catch (error) {
       console.log("User create error:");
@@ -110,29 +134,39 @@ class UserController {
   async delete(req, res) {
     try {
       const { id } = req.params;
-      if (!id) return res.status(422).json({ message: "ID пользователя не передан" });
-      User.findOne({_id: id}).exec(function(err, user){
-        if(err) throw {message:'При удалении пользователя вощникла проблема'};
-        if(!user)
-          throw {message:'Пользователь не найден'};
-        });
-        
-      // return res.status(200).json({'message':'deleted'});
+      if (!id)
+        return res.status(422).json({ message: "ID пользователя не передан" });
+      let user = await User.findByIdAndDelete(id).exec();
+      if (user.image != null) FileService.delete(user.image, "images");
+      return res.status(200).send();
     } catch (error) {
-      res.status(500).json(error);
+      console.log("User deleting error:");
+      console.log(error);
+      res
+        .status(500)
+        .json(
+          Object.assign(error, { message: "Ошибка при удалении пользователя" })
+        );
     }
   }
-  async update(req, res) {
+  async verify(req, res) {
     try {
-      const { name, surname, father_name, email, password } = req.body;
-      const founded = await User.findOne(
-        { email: email },
-        (error, user) => {}
-      ).exec();
+      const id = req.params.id;
+      
+      let user = await User.findByIdAndUpdate(id, { verification: true }).exec()
+        .then(() => {
+          return res.status(200).send();
+        })
+        .catch((error) => {
+          return res
+            .status(500)
+            .json({ message: `Не удалось верифицировать пользователя`, error })
+            .send();
+        });
     } catch (error) {
-      console.log("User update error");
+      console.log("User verify error:");
       console.log(error);
-      return res.code(500).json(error);
+      return res.status(500).json(error);
     }
   }
 }
