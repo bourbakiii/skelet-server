@@ -1,11 +1,20 @@
+import Category from "../category/Category.js";
 import Product from "./Product.js";
 import Category from "../category/Category.js";
 
 class ProductController {
   async create(req, res) {
     try {
-      const { image, name, description, price, discount_price, active, stock } =
-        req.body;
+      const {
+        image,
+        name,
+        description,
+        price,
+        discount_price,
+        active,
+        stock,
+        categories,
+      } = req.body;
       const product = await Product.create({
         image,
         name,
@@ -14,20 +23,27 @@ class ProductController {
         discount_price,
         active,
         stock,
+        categories,
       });
       res.status(200).json(product);
     } catch (error) {
       console.log("Product create error:");
       console.log(error);
-      res.status(500).json(error);
+      res
+        .status(500)
+        .json({
+          success: false,
+          message: "Не удалось добавить продукт, попробуйте позже",
+          data: error,
+        });
     }
   }
   async getAll(req, res) {
     try {
-      const products = await Product.find();
-      let categories = new Array();
-      await products.forEach(element=>{
-      })
+      const products = await Product.find().populate({
+        path: "categories",
+        select: "name",
+      });
       return res.json(products);
     } catch (error) {
       res.status(500).json(error);
@@ -38,8 +54,23 @@ class ProductController {
       const { id } = req.params;
       if (!id)
         return res.status(500).json({ message: "ID продукта не указан" });
-      const products = await Product.findById(id);
-      return res.json(products);
+      Product.findById(id)
+        .populate({ path: "categories", select: "name" })
+        .exec()
+        .then(async (product) => {
+          return res.status(200).json({
+            success: false,
+            message: "Продукт найден",
+            data: product,
+          });
+        })
+        .catch((error) => {
+          return res.status(500).json({
+            success: false,
+            message: "При получении продукта возникла ошибка, попробуйте позже",
+            data: error,
+          });
+        });
     } catch (error) {
       res.status(500).json(error);
     }

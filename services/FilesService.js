@@ -2,7 +2,7 @@ import { v4 } from "uuid";
 import { resolve } from "path";
 import * as fs from 'fs';
 class FileService {
-  save(file, directory = "images") {
+  save(file, directory) {
     const name = v4() + ".png";
     file.mv(resolve(`static/${directory}/`, name));
     return name;

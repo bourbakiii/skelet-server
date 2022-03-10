@@ -10,6 +10,10 @@ const Code = new mongoose.Schema({
         type: String,
         required: [true, "Code не передан"],
     },
+    type:{
+        type: String,
+        required: [true, "Тип кода не передан"]
+    }
 });
 Code.plugin(ttl, { ttl: '10m' });
 export default mongoose.model("Code",Code);

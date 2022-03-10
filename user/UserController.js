@@ -45,10 +45,12 @@ class UserController {
         from: "Сайт-скелет",
         to: email,
         subject: "Ваш код для верификации на сайте-скелете:",
-        html: `Ваш <i>код</i>:<h3>${code}'</h3>
+        html: `Ваш <i>код</i>:<h3>${code}</h3>
           <br/> (внешний вид письма будет на выбор заказчика)`,
       });
-      return res.status(200).json(user);
+      user.token = get_aphabet(35);
+      user.save();
+      res.status(200).json(user);
     } catch (error) {
       console.log("User create error:");
       console.log(error);
@@ -152,8 +154,9 @@ class UserController {
   async verify(req, res) {
     try {
       const id = req.params.id;
-      
-      let user = await User.findByIdAndUpdate(id, { verification: true }).exec()
+
+      let user = await User.findByIdAndUpdate(id, { verification: true })
+        .exec()
         .then(() => {
           return res.status(200).send();
         })
