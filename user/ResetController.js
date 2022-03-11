@@ -4,18 +4,18 @@ import nodemailer from "nodemailer";
 import mongoose from "mongoose";
 let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
 let transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: "gabisov05@gmail.com",
-        pass: "8236251telef",
-    },
+  service: "gmail",
+  auth: {
+    user: "gabisov05@gmail.com",
+    pass: "8236251telef",
+  },
 });
 
 function get_aphabet(length) {
-    let letter = "";
-    for (let i = 0; i < length; i++)
-        letter += alphabet[Math.floor(Math.random() * alphabet.length)];
-    return letter;
+  let letter = "";
+  for (let i = 0; i < length; i++)
+    letter += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return letter;
 }
 class ResetController {
   async send(req, res) {
@@ -68,7 +68,7 @@ class ResetController {
         message: "Пользователь с таким адресом почты не зарегистрирован",
       });
     await Code.findOne({ user_email: user.email }, async (error, code_for_check) => {
-      if(error){
+      if (error) {
         return res
           .status(500)
           .json({ success: false, message: "При проверка кода возникла какая-то ошибка" });
@@ -88,9 +88,18 @@ class ResetController {
         html: `Вы успешно сменили пароль на сайте-скелете
         <br/> (внешний вид письма будет на выбор заказчика)`,
       });
+      await Code.findByIdAndDelete(code_for_check.id);
       return res.json({ success: true, message: "Код подтвержден" });
     });
   }
+  async reset(req, res) {
+    const { email, password } = req.body;
+    let validation_errors = { password }; if (!password) validation_errors.password = 'Пароль обязателен';
+    if (!email) return res.status(422).json({ success: false, general_message: "Адрес почты не передан" });
+    if (validation_errors.password) return res.status(422).json({ success: false, validation_errors });
+    const user = await User.find({email}).exec();
+  }
+
 }
 
 export default new ResetController();

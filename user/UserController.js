@@ -156,9 +156,7 @@ class UserController {
   }
   async getByToken(req, res) {
     try {
-      console.log(req.query);
       const { token } = req.query;
-      console.log(token);
       if (!token) return res.status(422).json({succes:false, message: "Токен пользователя не передан" });
       let user = await User.findOne({ token });
       if (!user) res.status(404).json({ success: false, general_message: "Пользователь не найден" });
