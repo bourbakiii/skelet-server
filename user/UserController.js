@@ -21,10 +21,18 @@ class UserController {
   async create(req, res) {
     try {
       const { name, surname, father_name, email, password } = req.body;
+      let validation_errors = { name: null, surname: null, father_name: null, email: null, password: null };
+      if (!name) validation_errors.name = 'Имя обязателено';
+      if (!surname) validation_errors.surname = 'Фамилия обязательна';
+      if (!father_name) validation_errors.father_name = 'Отчество обязательно';
+      if (!email) validation_errors.email = 'Адрес электоронной почты обязателен';
+      if (!password) validation_errors.password = 'Пароль обязателен';
+      if (validation_errors.name || validation_errors.surname || validation_errors.father_name || validation_errors.email || validation_errors.password) return res.status(422).json({ success: false, validation_errors });
       const founded = await User.findOne({ email: email }).exec();
       if (founded)
         return res.status(409).json({
-          message:
+          success: false,
+          general_message:
             "Пользователь с таким адресом электронной почты уже зарегистрирован",
         });
       let image_name = null;
@@ -40,7 +48,13 @@ class UserController {
         password,
       });
       let code = get_aphabet(5);
-      Code.create({ user_id: user.id, code });
+      await Code.findOneAndUpdate(
+        { user_email: user.email },
+        { code: code, type: "registration" },
+        {
+          upsert: true,
+        }
+      );
       await transporter.sendMail({
         from: "Сайт-скелет",
         to: email,
@@ -50,7 +64,7 @@ class UserController {
       });
       user.token = get_aphabet(35);
       user.save();
-      res.status(200).json(user);
+      res.status(200).json({ success: true, user });
     } catch (error) {
       console.log("User create error:");
       console.log(error);
@@ -86,28 +100,28 @@ class UserController {
   async login(req, res) {
     try {
       const { email, password } = req.body;
-      let validation_errors = { email: null,password: null};
-      if(!email) validation_errors.email = 'Адрес электоронной почты обязателен';
-      if(!password) validation_errors.password = 'Пароль обязателен';
-      if(validation_errors.email||validation_errors.password) return res.status(422).json({success:false, validation_errors});
+      let validation_errors = { email: null, password: null };
+      if (!email) validation_errors.email = 'Адрес электоронной почты обязателен';
+      if (!password) validation_errors.password = 'Пароль обязателен';
+      if (validation_errors.email || validation_errors.password) return res.status(422).json({ success: false, validation_errors });
       User.findOne({ email }, (err, user) => {
         if (err)
           return res
             .status(500)
-            .json({ success:false, general_message: "Возникла ошибка, попробуйте позже" });
+            .json({ success: false, general_message: "Возникла ошибка, попробуйте позже" });
         if (!user)
           return res
             .status(404)
-            .json({ success:false, general_message: "Неверный адрес электронной почты и/или пароль" });
+            .json({ success: false, general_message: "Пользователь не найден" });
         user.verifyPassword(password, (err, valid) => {
           if (err)
-            return res.status(500).json({ success:false, general_message:"Возникла ошибка, попробуйте позже"});
+            return res.status(500).json({ success: false, general_message: "Возникла ошибка, попробуйте позже" });
           else if (valid) {
             user.token = get_aphabet(35);
             user.save();
-            return res.status(200).json(user);
+            return res.status(200).json({ success: true, user });
           } else
-            return res.status(404).json({
+            return res.status(401).json({
               success: false,
               general_message: "Неверный адрес электронной почты и/или пароль",
             });
