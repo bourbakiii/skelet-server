@@ -86,25 +86,30 @@ class UserController {
   async login(req, res) {
     try {
       const { email, password } = req.body;
+      let validation_errors = { email: null,password: null};
+      if(!email) validation_errors.email = 'Адрес электоронной почты обязателен';
+      if(!password) validation_errors.password = 'Пароль обязателен';
+      if(validation_errors.email||validation_errors.password) return res.status(422).json({success:false, validation_errors});
       User.findOne({ email }, (err, user) => {
         if (err)
           return res
             .status(500)
-            .json({ message: "Возникла ошибка, попробуйте позже" });
+            .json({ success:false, general_message: "Возникла ошибка, попробуйте позже" });
         if (!user)
           return res
             .status(404)
-            .json({ message: "Неверный адрес электронной почты и/или пароль" });
+            .json({ success:false, general_message: "Неверный адрес электронной почты и/или пароль" });
         user.verifyPassword(password, (err, valid) => {
           if (err)
-            return res.status(500).json("Возникла ошибка, попробуйте позже");
+            return res.status(500).json({ success:false, general_message:"Возникла ошибка, попробуйте позже"});
           else if (valid) {
             user.token = get_aphabet(35);
             user.save();
             return res.status(200).json(user);
           } else
             return res.status(404).json({
-              message: "Неверный адрес электронной почты и/или пароль",
+              success: false,
+              general_message: "Неверный адрес электронной почты и/или пароль",
             });
         });
       });

@@ -1,5 +1,5 @@
-import Category from "../category/Category.js";
 import Product from "./Product.js";
+import Category from "../category/Category.js";
 
 class ProductController {
   async create(req, res) {

@@ -1,19 +1,22 @@
 import mongoose from "mongoose";
-import ttl from 'mongoose-ttl';
 
-const Code = new mongoose.Schema({
-    user_id: {
-        type: String,
-        required: [true, "ID не передан"],
+const Code = new mongoose.Schema(
+  {
+    user_email: {
+      type: String,
+      required: [true, "Email не передан"],
     },
-    code:{
-        type: String,
-        required: [true, "Code не передан"],
+    code: {
+      type: String,
+      required: [true, "Code не передан"],
     },
-    type:{
-        type: String,
-        required: [true, "Тип кода не передан"]
-    }
-});
-Code.plugin(ttl, { ttl: '10m' });
-export default mongoose.model("Code",Code);
+    type: {
+      type: String,
+      required: [true, "Тип кода не передан"],
+    },
+  },
+  { timestamps: true }
+);
+Code.index({ updatedAt: 1 }, { expireAfterSeconds: 86400 });
+
+export default mongoose.model("Code", Code);
