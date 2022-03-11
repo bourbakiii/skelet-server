@@ -145,10 +145,27 @@ class UserController {
     try {
       const { id } = req.params;
       if (!id)
-        return res.status(422).json({ message: "ID пользователя не передан" });
+        return res.status(422).json({ success:false, message: "ID пользователя не передан" });
       let user = await User.findOne({ id });
-      return res.status(200).json(user);
+      return res.status(200).json({success:true, user});
     } catch (error) {
+      console.log("User get one error:");
+      console.log(error);
+      res.status(500).json(error);
+    }
+  }
+  async getByToken(req, res) {
+    try {
+      console.log(req.query);
+      const { token } = req.query;
+      console.log(token);
+      if (!token) return res.status(422).json({succes:false, message: "Токен пользователя не передан" });
+      let user = await User.findOne({ token });
+      if (!user) res.status(404).json({ success: false, general_message: "Пользователь не найден" });
+      return res.status(200).json({succes:true, user});
+    } catch (error) {
+      console.log("User get by token error:");
+      console.log(error);
       res.status(500).json(error);
     }
   }

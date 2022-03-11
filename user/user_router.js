@@ -11,11 +11,12 @@ router.use(fileUpload());
  
 router.post("/users", UserController.create);
 router.post("/user", UserController.login);
+router.get("/user/:id", permission_middleware, UserController.getOne);
+router.get("/user", UserController.getByToken);
 router.put("/users", token_middewaware, UserController.update);
 router.get("/users", permission_middleware, UserController.getAll);
 router.put("/user/:id", token_middewaware, action_code_middleware, UserController.verify);
-router.get("/user/:id", permission_middleware, UserController.getOne);
-router.delete("/user/:id", UserController.delete);
+router.delete("/user/:id", permission_middleware, UserController.delete);
 router.get("/reset/send", ResetController.send);
 router.post("/reset/check", ResetController.check);
 
