@@ -17,6 +17,6 @@ const Code = new mongoose.Schema(
   },
   { timestamps: true }
 );
-Code.index({ updatedAt: 1 }, { expireAfterSeconds: 86400 });
+Code.index({ "updatedAt": 1 }, { expireAfterSeconds: 86400 });
 
 export default mongoose.model("Code", Code);
