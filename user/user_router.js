@@ -17,6 +17,7 @@ router.put("/users", token_middewaware, UserController.update);
 router.get("/users", permission_middleware, UserController.getAll);
 router.put("/user/:id", token_middewaware, action_code_middleware, UserController.verify);
 router.delete("/user/:id", permission_middleware, UserController.delete);
+router.put("/reset", ResetController.reset);
 router.get("/reset/send", ResetController.send);
 router.post("/reset/check", ResetController.check);
 

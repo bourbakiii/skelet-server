@@ -19,16 +19,16 @@ function get_aphabet(length) {
 }
 class ResetController {
   async send(req, res) {
-    const { email } = req.body;
+    const { email } = req.query;
     if (!email)
       return res
         .status(422)
-        .json({ success: false, message: "Адрес почты не передан" });
+        .json({ success: false, general_message: "Адрес почты не передан" });
     const user = await User.findOne({ email }).exec();
     if (!user)
       return res.status(404).json({
         success: false,
-        message: "Пользователь с таким адресом почты не зарегистрирован",
+        general_message: "Пользователь с таким адресом почты не зарегистрирован",
       });
     let code = get_aphabet(5);
     await Code.findOneAndUpdate(
@@ -45,42 +45,42 @@ class ResetController {
       html: `Ваш <i>код</i>:<h3>${code}</h3>
           <br/> (внешний вид письма будет на выбор заказчика)`,
     });
-    return res.json({ success: true, message: "Код отправлен" });
+    return res.json({ success: true, general_message: "Код отправлен" });
   }
   async check(req, res) {
     const { email, code } = req.body;
     if (!email)
       return res
         .status(422)
-        .json({ success: false, message: "Адрес почты не передан" });
+        .json({ success: false, general_message: "Адрес почты не передан" });
     if (!code)
       return res
         .status(422)
-        .json({ success: false, message: "Код не передан" });
+        .json({ success: false, general_message: "Код не передан" });
     if (code.length != 5)
       return res
         .status(422)
-        .json({ success: false, message: "Длина кода - 5 символов" });
+        .json({ success: false, general_message: "Длина кода - 5 символов" });
     const user = await User.findOne({ email }).exec();
     if (!user)
       return res.status(404).json({
         success: false,
-        message: "Пользователь с таким адресом почты не зарегистрирован",
+        general_message: "Пользователь с таким адресом почты не зарегистрирован",
       });
     await Code.findOne({ user_email: user.email }, async (error, code_for_check) => {
       if (error) {
         return res
           .status(500)
-          .json({ success: false, message: "При проверка кода возникла какая-то ошибка" });
+          .json({ success: false, general_message: "При проверка кода возникла какая-то ошибка" });
       }
       if (!code_for_check)
         return res
           .status(404)
-          .json({ success: false, message: "Код для пользователя не найден" });
+          .json({ success: false, general_message: "Код для пользователя не найден" });
       if (code != code_for_check.code)
         return res
           .status(422)
-          .json({ success: false, message: "Неверный код" });
+          .json({ success: false, general_message: "Неверный код" });
       await transporter.sendMail({
         from: "Сайт-скелет",
         to: email,
@@ -89,15 +89,16 @@ class ResetController {
         <br/> (внешний вид письма будет на выбор заказчика)`,
       });
       await Code.findByIdAndDelete(code_for_check.id);
-      return res.json({ success: true, message: "Код подтвержден" });
+      return res.json({ success: true, general_message: "Код подтвержден" });
     });
   }
   async reset(req, res) {
     const { email, password } = req.body;
-    let validation_errors = { password }; if (!password) validation_errors.password = 'Пароль обязателен';
+    let validation_errors = { password:null }; if (!password) validation_errors.password = 'Пароль обязателен';
     if (!email) return res.status(422).json({ success: false, general_message: "Адрес почты не передан" });
     if (validation_errors.password) return res.status(422).json({ success: false, validation_errors });
-    const user = await User.find({email}).exec();
+    const user = await User.findOneAndUpdate({email},{password},{new:true}).exec();
+    return res.json({success:true,user});
   }
 
 }
