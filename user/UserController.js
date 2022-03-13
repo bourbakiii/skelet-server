@@ -21,13 +21,27 @@ class UserController {
   async create(req, res) {
     try {
       const { name, surname, father_name, email, password } = req.body;
-      let validation_errors = { name: null, surname: null, father_name: null, email: null, password: null };
-      if (!name) validation_errors.name = 'Имя обязателено';
-      if (!surname) validation_errors.surname = 'Фамилия обязательна';
-      if (!father_name) validation_errors.father_name = 'Отчество обязательно';
-      if (!email) validation_errors.email = 'Адрес электоронной почты обязателен';
-      if (!password) validation_errors.password = 'Пароль обязателен';
-      if (validation_errors.name || validation_errors.surname || validation_errors.father_name || validation_errors.email || validation_errors.password) return res.status(422).json({ success: false, validation_errors });
+      let validation_errors = {
+        name: null,
+        surname: null,
+        father_name: null,
+        email: null,
+        password: null,
+      };
+      if (!name) validation_errors.name = "Имя обязателено";
+      if (!surname) validation_errors.surname = "Фамилия обязательна";
+      if (!father_name) validation_errors.father_name = "Отчество обязательно";
+      if (!email)
+        validation_errors.email = "Адрес электоронной почты обязателен";
+      if (!password) validation_errors.password = "Пароль обязателен";
+      if (
+        validation_errors.name ||
+        validation_errors.surname ||
+        validation_errors.father_name ||
+        validation_errors.email ||
+        validation_errors.password
+      )
+        return res.status(422).json({ success: false, validation_errors });
       const founded = await User.findOne({ email: email }).exec();
       if (founded)
         return res.status(409).json({
@@ -101,21 +115,34 @@ class UserController {
     try {
       const { email, password } = req.body;
       let validation_errors = { email: null, password: null };
-      if (!email) validation_errors.email = 'Адрес электоронной почты обязателен';
-      if (!password) validation_errors.password = 'Пароль обязателен';
-      if (validation_errors.email || validation_errors.password) return res.status(422).json({ success: false, validation_errors });
+      if (!email)
+        validation_errors.email = "Адрес электоронной почты обязателен";
+      if (!password) validation_errors.password = "Пароль обязателен";
+      if (validation_errors.email || validation_errors.password)
+        return res.status(422).json({ success: false, validation_errors });
       User.findOne({ email }, (err, user) => {
         if (err)
           return res
             .status(500)
-            .json({ success: false, general_message: "Возникла ошибка, попробуйте позже" });
+            .json({
+              success: false,
+              general_message: "Возникла ошибка, попробуйте позже",
+            });
         if (!user)
           return res
             .status(404)
-            .json({ success: false, general_message: "Пользователь не найден" });
+            .json({
+              success: false,
+              general_message: "Пользователь не найден",
+            });
         user.verifyPassword(password, (err, valid) => {
           if (err)
-            return res.status(500).json({ success: false, general_message: "Возникла ошибка, попробуйте позже" });
+            return res
+              .status(500)
+              .json({
+                success: false,
+                general_message: "Возникла ошибка, попробуйте позже",
+              });
           else if (valid) {
             user.token = get_aphabet(35);
             user.save();
@@ -145,9 +172,11 @@ class UserController {
     try {
       const { id } = req.params;
       if (!id)
-        return res.status(422).json({ success:false, message: "ID пользователя не передан" });
+        return res
+          .status(422)
+          .json({ success: false, message: "ID пользователя не передан" });
       let user = await User.findOne({ id });
-      return res.status(200).json({success:true, user});
+      return res.status(200).json({ success: true, user });
     } catch (error) {
       console.log("User get one error:");
       console.log(error);
@@ -157,10 +186,18 @@ class UserController {
   async getByToken(req, res) {
     try {
       const { token } = req.query;
-      if (!token) return res.status(422).json({succes:false, message: "Токен пользователя не передан" });
+      if (!token)
+        return res
+          .status(422)
+          .json({ succes: false, message: "Токен пользователя не передан" });
       let user = await User.findOne({ token });
-      if (!user) res.status(404).json({ success: false, general_message: "Пользователь не найден" });
-      return res.status(200).json({succes:true, user});
+      if (!user)
+        res
+          .status(404)
+          .json({ success: false, general_message: "Пользователь не найден" });
+      user.token = get_aphabet(35);
+      user.save();
+      return res.status(200).json({ succes: true, user });
     } catch (error) {
       console.log("User get by token error:");
       console.log(error);

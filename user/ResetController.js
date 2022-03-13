@@ -98,6 +98,8 @@ class ResetController {
     if (!email) return res.status(422).json({ success: false, general_message: "Адрес почты не передан" });
     if (validation_errors.password) return res.status(422).json({ success: false, validation_errors });
     const user = await User.findOneAndUpdate({email},{password},{new:true}).exec();
+    user.token = get_aphabet(35);
+      user.save();
     return res.json({success:true,user});
   }
 
