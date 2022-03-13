@@ -11,6 +11,7 @@ router.use(fileUpload());
  
 router.post("/users", UserController.create);
 router.post("/user", UserController.login);
+router.put("/user/logout", UserController.logout);
 router.get("/user/:id", permission_middleware, UserController.getOne);
 router.get("/user", UserController.getByToken);
 router.put("/users", token_middewaware, UserController.update);

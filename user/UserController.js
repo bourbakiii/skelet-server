@@ -122,27 +122,21 @@ class UserController {
         return res.status(422).json({ success: false, validation_errors });
       User.findOne({ email }, (err, user) => {
         if (err)
-          return res
-            .status(500)
-            .json({
+          return res.status(500).json({
+            success: false,
+            general_message: "Возникла ошибка, попробуйте позже",
+          });
+        if (!user)
+          return res.status(404).json({
+            success: false,
+            general_message: "Пользователь не найден",
+          });
+        user.verifyPassword(password, (err, valid) => {
+          if (err)
+            return res.status(500).json({
               success: false,
               general_message: "Возникла ошибка, попробуйте позже",
             });
-        if (!user)
-          return res
-            .status(404)
-            .json({
-              success: false,
-              general_message: "Пользователь не найден",
-            });
-        user.verifyPassword(password, (err, valid) => {
-          if (err)
-            return res
-              .status(500)
-              .json({
-                success: false,
-                general_message: "Возникла ошибка, попробуйте позже",
-              });
           else if (valid) {
             user.token = get_aphabet(35);
             user.save();
@@ -239,6 +233,27 @@ class UserController {
         });
     } catch (error) {
       console.log("User verify error:");
+      console.log(error);
+      return res.status(500).json(error);
+    }
+  }
+  async logout(req, res) {
+    try {
+      const { token } = req.body;
+      if (!token)
+        return res
+          .status(422)
+          .json({ succes: false, message: "Токен пользователя не передан" });
+          let user = await User.findOne({ token });
+      if (!user)
+        res
+          .status(404)
+          .json({ success: false, general_message: "Пользователь не найден" });
+      user.token = null;
+      user.save();
+      return res.status(200).json({ succes: true });
+    } catch (error) {
+      console.log("User logout error:");
       console.log(error);
       return res.status(500).json(error);
     }
