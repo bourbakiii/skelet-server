@@ -1,5 +1,6 @@
 import Router from "express";
 import UserController from "./UserController.js";
+
 // import ResetController from "./ResetController.js";
 // import permission_middleware from "../middleware/token_permission.js";
 // import token_middewaware from "../middleware/token_user.js";
@@ -7,7 +8,7 @@ import UserController from "./UserController.js";
 import fileUpload from 'express-fileupload';
 
 const router = new Router();
-router.use(fileUpload());
+// router.use(fileUpload());
 
 // router.post("/users", UserController.create);
 // router.post("/user", UserController.login);

@@ -6,6 +6,8 @@ import User from "./User.js";
 import {response} from './../response.js';
 
 import FileService from "../services/FilesService.js";
+import {connection} from "../сonnection.js";
+
 
 let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
 // let transporter = nodemailer.createTransport({
@@ -170,8 +172,11 @@ class UserController {
     // }
 
     async getAll(req, res) {
-
-        return response.success(users, res);
+        return connection.query('SELECT * FROM users', (error, result) => {
+            if (error) throw error;
+            return response.success(result, res);
+        });
+        // return response.success(users, res);
 
 
         // try {
