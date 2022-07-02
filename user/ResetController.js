@@ -1,7 +1,7 @@
-import User from "./User.js";
+// import User from "./User.js";
 import Code from "../code/Code.js";
 import nodemailer from "nodemailer";
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
 let transporter = nodemailer.createTransport({
   service: "gmail",
@@ -17,6 +17,7 @@ function get_aphabet(length) {
     letter += alphabet[Math.floor(Math.random() * alphabet.length)];
   return letter;
 }
+
 class ResetController {
   async send(req, res) {
     const { email } = req.query;
