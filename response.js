@@ -11,7 +11,12 @@ export const response = {
         res.end();
     },
     validationErrors(data, res) {
-        res.json({success: false, code: 422, data: {message: 'Не передано одно из полей',  ...(data || {})}});
+        res.json({
+            success: false, code: 422, data: {
+                message: 'Не передано одно из полей', errors: (data || [])
+            }
+        })
+        ;
         res.end();
     },
     unathorized(res) {
