@@ -11,12 +11,14 @@ import {connection} from "../сonnection.js";
 import {parseBearer} from "../helper.js";
 import bcrypt from "bcrypt";
 
-let transporter = nodemailer.createTransport({
-    service: "gmail",
+
+const transporter = nodemailer.createTransport({
+    port: 465,               // true for 465, false for other ports
+    host: "smtp.gmail.com", service: "gmail",
+
     auth: {
-        user: "gabisov05@gmail.com",
-        pass: "8236251telef",
-    },
+        user: "gabisov05@gmail.com", pass: "wyqmyjcjpfeiyyzo",
+    }, secure: true,
 });
 
 const users = [{id: 1, name: "Первый"}, {id: 2, name: "Второй"}]
@@ -37,26 +39,34 @@ class UserController {
 
         return bcrypt.genSalt(10, function (err, salt) {
             if (err) return response.error({
-                status: 500,
-                data: {message: 'При хешировании возникла проблема, попробуйте позже', err: err}
+                status: 500, data: {message: 'При хешировании возникла проблема, попробуйте позже', err: err}
             }, res);
-            return bcrypt.hash(`${password}`, salt, function (error, hash) {
+            return bcrypt.hash(`${password}`, salt, async function (error, hash) {
                 if (error) return response.error({
-                    status: 500,
-                    data: {message: 'При хешировании возникла проблема, попробуйте позже', error}
+                    status: 500, data: {message: 'При хешировании возникла проблема, попробуйте позже', error}
                 }, res);
 
-                return connection.query(`INSERT INTO users(name,second_name,father_name,email, phone,password) VALUES ('${name}','${second_name}', '${father_name}', '${email}', '${phone}', '${hash}')`, (error, result) => {
-                    console.log(error, result);
-                    if (error) return response.error({
-                        status: 500,
-                        data: {message: 'Кажется, что-то пошло не так, попробуйте позже', error}
+                return await transporter.sendMail({
+                    from: "В голове у мирмикипера",
+                    to: email,
+                    subject: "Ваш код для верификации на сайте-скелете:",
+                    html: `Ваш <i>код</i>:<h3>{место для кода}</h3>`,
+                }).then(() => {
+                    return connection.query(`INSERT INTO users(name,second_name,father_name,email, phone,password) VALUES ('${name}','${second_name}', '${father_name}', '${email}', '${phone}', '${hash}')`, (error, result) => {
+                        if (error) return response.error({
+                            status: 500, data: {message: 'Кажется, что-то пошло не так, попробуйте позже', error}
+                        }, res);
+                        return response.success(null, res)
+                    });
+                }).catch((error) => {
+                    return response.error({
+                        status: 500, data: {
+                            message: 'Кажется, что-то пошло не так при отправлении письма на вашу почту, попробуйте позже',
+                            error
+                        }
                     }, res);
 
 
-
-
-                    return response.success(null, res);
                 });
             });
 
@@ -110,11 +120,9 @@ class UserController {
         //     }, res);
         //     if (!result.length) return response.notFounded({message: "Не удалось найти пользователя"}, res);
         //     return response.success(result, res);
-        // });
+        //
 
     }
-
-
 }
 
 export default new UserController();
