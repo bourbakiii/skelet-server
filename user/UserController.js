@@ -65,17 +65,12 @@ class UserController {
                             error
                         }
                     }, res);
-
-
                 });
             });
 
         });
 
-
     }
-
-
     async getAll(req, res) {
         return connection.query(`SELECT * FROM users`, (error, result) => {
             if (error) return response.error({

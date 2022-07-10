@@ -21,7 +21,6 @@ const router = new Router();
 
 // permission_middleware
 router.post("/users/create", body('name').notEmpty().withMessage('Имя обязательно').bail().trim(), body('second_name').notEmpty().withMessage('Фамилия обязательна').bail().trim(), body('father_name').notEmpty().withMessage('Отчество обязательно').bail().trim(), body('email').notEmpty().withMessage('Адрес электронной обязателен').bail().isEmail().withMessage('Адрес электоронной почты невалиден').bail().custom((value) => {
-
         return new Promise((resolve, reject) => {
             connection.query(`SELECT * FROM users WHERE email = '${value}'`, (error, result) => {
                 if (error) reject(new Error('При проверке почты на уникальность возникла ошибка'));
@@ -34,15 +33,8 @@ router.post("/users/create", body('name').notEmpty().withMessage('Имя обя�
     }).withMessage('Длина номера телефона - 10 символов').bail().isNumeric().withMessage('Номер телефона должен состоять только из цифр').bail().custom((value) => {
         return new Promise((resolve, reject) => {
             connection.query(`SELECT * FROM users WHERE email = '${value}'`, (error, result) => {
-                console.log("the resultat is");
-                console.log(result);
-                if (error) {
-                    reject(new Error('При проверке почты на уникальность возникла ошибка'));
-                }
-
-                if (result.length) {
-                    reject(new Error('Кажется, такой адрес электронной почты уже занят'));
-                }
+                if (error) reject(new Error('При проверке почты на уникальность возникла ошибка'));
+                if (result.length) reject(new Error('Кажется, такой адрес электронной почты уже занят'));
                 resolve(true);
             });
         })
