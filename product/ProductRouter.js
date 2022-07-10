@@ -12,12 +12,13 @@ const router = new Router();
 // permission_middleware
 // TODO: сделать имена продуктов уникальными при создании и изменении
 
-router.post("/products/create",
-// TODO: проверить работу вариаций
-    body('name').notEmpty().withMessage('Имя обязательно').bail().trim(), body('price').notEmpty().withMessage('Цена обязательна').isNumeric().withMessage('Цена дожна быть числом'), body('discount_price').optional({checkFalsy: true}).isNumeric().withMessage('Цена со скидкой дожна быть числом'),
-    validation, ProductController.create);
+router.post("/products/create", // TODO: проверить работу вариаций
+    body('name').notEmpty().withMessage('Имя обязательно').bail().trim(), body('price').notEmpty().withMessage('Цена обязательна').isNumeric().withMessage('Цена дожна быть числом'), body('discount_price').optional({checkFalsy: true}).isNumeric().withMessage('Цена со скидкой дожна быть числом'), validation, ProductController.create);
 
-router.get("/products", ProductController.get);
+router.get("/products", ProductController.getAll);
+router.get("/products/:id", ProductController.get);
+
+
 //     body('password').notEmpty().withMessage('Пароль обязателен').bail().isLength({min: 8}).withMessage('Минимальная длина пароля - 8 символов'), validation, UserController.create);
 // router.post("/users/:id/logout", UserController.logout);
 // router.get("/users/:id", UserController.getById);
