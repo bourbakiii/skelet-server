@@ -68,6 +68,9 @@ class UserController {
             return response.success(result, res);
         });
     }
+    async update(req,res){
+
+    }
 }
 
 export default new UserController();
