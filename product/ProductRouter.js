@@ -2,7 +2,6 @@ import Router from "express";
 import ProductController from "./ProductController.js";
 
 import {body} from 'express-validator';
-import {connection} from "../сonnection.js";
 import validation from "../middleware/validation.js";
 
 const router = new Router();
@@ -17,6 +16,9 @@ router.post("/products/create", // TODO: проверить работу вар�
 
 router.get("/products", ProductController.getAll);
 router.get("/products/:id", ProductController.get);
+router.patch("/products/:id", ProductController.update);
+router.delete("/products/:id", ProductController.delete);
+router.post("/products/images", ProductController.images);
 
 
 //     body('password').notEmpty().withMessage('Пароль обязателен').bail().isLength({min: 8}).withMessage('Минимальная длина пароля - 8 символов'), validation, UserController.create);

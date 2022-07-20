@@ -1,15 +1,11 @@
 // import User from "./User.js";
 // import Code from "../code/Code.js";
 import nodemailer from "nodemailer";
-import {body, validationResult} from 'express-validator';
 
 import {response} from './../response.js';
 
 // import FileService from "../services/FilesService.js";
 import {connection} from "../сonnection.js";
-
-import {parseBearer} from "../helper.js";
-import bcrypt from "bcrypt";
 
 
 const transporter = nodemailer.createTransport({
@@ -35,7 +31,7 @@ const users = [{id: 1, name: "Первый"}, {id: 2, name: "Второй"}]
 class UserController {
     async create(req, res) {
         const {name, price, discount_price = null, variations = null, description = null} = req.body;
-        connection.query(`INSERT INTO products(name,price,discount_price,variations, description) VALUES ('${name}',${price}, ${discount_price}, ${variations?variations:null}, ${description})`, (error, result) => {
+        connection.query(`INSERT INTO products(name,price,discount_price,variations, description) VALUES ('${name}',${price}, ${discount_price}, '${variations?JSON.stringify(variations):null}', ${description})`, (error, result) => {
             if (error) return response.error({
                 status: 500, data: {message: 'Кажется, что-то пошло не так, попробуйте позже', error}
             }, res);
@@ -53,7 +49,7 @@ class UserController {
     }
 
     async get(req, res) {
-        console.log(req);
+
         if (!req.params.id) return response.validationErrors({
             validation_fields: {
                 id: 'Не передан ID продукта'
@@ -68,8 +64,49 @@ class UserController {
             return response.success(result, res);
         });
     }
-    async update(req,res){
 
+    async update(req, res) {
+        if (!req.params.id) return response.validationErrors({
+            validation_fields: {
+                id: 'Не передан ID продукта'
+            }
+        }, res);
+
+        let keys = Object.entries(req.body).map(el => {
+            return `${el[0]} = '${el[1]}'`;
+        });
+
+
+        return connection.query(`UPDATE products SET ${keys} WHERE id = ${req.params.id}`, (error, result) => {
+            if (error) return response.error({
+                status: 500, data: {message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error}
+            }, res);
+            return response.success(null, res);
+        });
+    }
+
+
+    async delete(req, res) {
+        if (!req.params.id) return response.validationErrors({
+            validation_fields: {
+                id: 'Не передан ID продукта'
+            }
+        }, res);
+
+        let keys = Object.entries(req.body).map(el => {
+            return `${el[0]} = '${el[1]}'`;
+        });
+
+        return connection.query(`DELETE FROM products WHERE id = ${req.params.id}`, (error, result) => {
+            if (error) return response.error({
+                status: 500, data: {message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error}
+            }, res);
+            return response.success(null, res);
+        });
+    }
+
+    async images(req,res){
+        console.log(req.files);
     }
 }
 
