@@ -106,7 +106,8 @@ class UserController {
     }
 
     async images(req,res){
-        console.log(req.files);
+        FileService.save(req.files["image"]);
+        response.success(req.files,res);
     }
 }
 
