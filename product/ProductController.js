@@ -3,8 +3,6 @@
 import nodemailer from "nodemailer";
 
 import {response} from './../response.js';
-
-// import FileService from "../services/FilesService.js";
 import {connection} from "../сonnection.js";
 
 
@@ -31,7 +29,7 @@ const users = [{id: 1, name: "Первый"}, {id: 2, name: "Второй"}]
 class UserController {
     async create(req, res) {
         const {name, price, discount_price = null, variations = null, description = null} = req.body;
-        connection.query(`INSERT INTO products(name,price,discount_price,variations, description) VALUES ('${name}',${price}, ${discount_price}, '${variations?JSON.stringify(variations):null}', ${description})`, (error, result) => {
+        connection.query(`INSERT INTO products(name,price,discount_price,variations, description) VALUES ('${name}',${price}, ${discount_price}, '${variations ? JSON.stringify(variations) : null}', ${description})`, (error, result) => {
             if (error) return response.error({
                 status: 500, data: {message: 'Кажется, что-то пошло не так, попробуйте позже', error}
             }, res);
@@ -105,9 +103,10 @@ class UserController {
         });
     }
 
-    async images(req,res){
-        FileService.save(req.files["image"]);
-        response.success(req.files,res);
+    async images(req, res) {
+        // FileService.save(req.files["image"]);
+        console.log(Object.keys(req));
+        response.success({kill:Object.keys(req)}, res);
     }
 }
 
