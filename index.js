@@ -15,3 +15,5 @@ app.use(express.json()).use(express.static('static')).use(cors()).use(body_parse
 
 const PORT = 5000;
 app.listen(PORT, console.log("%сSERVER STARTED SUCCESSFULL " + PORT));
+
+

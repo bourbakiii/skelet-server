@@ -11,7 +11,7 @@ export const response = {
         res.end();
     },
     validationErrors(data, res) {
-        res.json({
+        res.status(422).json({
             success: false, code: 422, data: {
                 message: 'Не передано одно из полей', errors: (data || [])
             }
