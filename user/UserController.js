@@ -111,24 +111,20 @@ class UserController {
     async login(req, res) {
         const { email, password } = req.body;
         return await connection.query(`SELECT * FROM users WHERE email = \'${email}\' LIMIT 1`, (error, result) => {
-            if (error) if (err) return response.error({
+            if (error) return response.error({
                 status: 500, data: { message: 'При проверке пользователя возникла проблема, попробуйте позже', err: err }
             }, res);
             if (!result.length) return response.error({
                 status: 404, data: { message: 'Пользователь не найден' }
             }, res);
             result = result[0];
-            console.log("The error is:");
-            console.log(error);
-            console.log("The result is:");
-            console.log(result);
             bcrypt.compare(password, result.password, function (err, result_of_compare) {
-                if (error) if (err) return response.error({
+                if (err) return response.error({
                     status: 500, data: { message: 'При проверке пароля возникла проблема, попробуйте позже', err: err }
                 }, res);
                 if (result_of_compare) {
                     delete result.password;
-                    return response.success({ error, result }, res);
+                    return response.success({ user: result }, res);
                 }
                 else return response.error({
                     status: 401, data: { message: 'Неверный пароль', err: err }
