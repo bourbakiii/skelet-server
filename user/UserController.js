@@ -1,7 +1,6 @@
 // import User from "./User.js";
 // import Code from "../code/Code.js";
 import nodemailer from "nodemailer";
-import { body, validationResult } from 'express-validator';
 
 import { response } from './../response.js';
 
