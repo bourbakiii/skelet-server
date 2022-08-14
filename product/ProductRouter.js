@@ -8,22 +8,23 @@ const router = new Router();
 
 
 router.post("/products/create",
-    body('name').notEmpty().withMessage('Имя обязательно').bail().trim(),
-    body('variations').notEmpty().withMessage('Вариации обязательны').bail()
-        .custom((value) => {
-            return new Promise((resolve, reject) => {
-                try {
-                    JSON.parse(value);
+    // body('name').notEmpty().withMessage('Имя обязательно').bail().trim(),
+    // body('variations').notEmpty().withMessage('Вариации обязательны').bail()
+    //     .custom((value) => {
+    //         return new Promise((resolve, reject) => {
+    //             try {
+    //                 JSON.parse(value);
 
-                    resolve(true);
-                }
-                catch {
-                    reject(new Error('Не валидное поле вариаций'));
-                }
-            })
-        }).withMessage('Кажется, вариации невалидны'),
+    //                 resolve(true);
+    //             }
+    //             catch {
+    //                 reject(new Error('Не валидное поле вариаций'));
+    //             }
+    //         })
+    //     }).withMessage('Кажется, вариации невалидны'),
     validation, ProductController.create);
 router.get("/products", ProductController.getAll);
+router.get("/products/without-category", ProductController.getWithoutCategory);
 router.get("/products/:id", ProductController.get);
 router.patch("/products/:id", ProductController.update);
 router.delete("/products/:id", ProductController.delete);

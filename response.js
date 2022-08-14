@@ -7,7 +7,7 @@ export const response = {
         res.end();
     },
     notFounded(data, res) {
-        res.json({success: false, code: 404, data});
+        res.status(404).json({success: false, code: 404, data});
         res.end();
     },
     validationErrors(data, res) {
@@ -15,8 +15,7 @@ export const response = {
             success: false, code: 422, data: {
                 message: 'Не передано одно из полей', errors: (data || [])
             }
-        })
-        ;
+        });
         res.end();
     },
     unathorized(res) {
