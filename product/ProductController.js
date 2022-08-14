@@ -7,15 +7,16 @@ class ProductController {
     async create(req, res) {
         const { name, variations, description = null } = req.body;
         const image_name = FileService.generateName();
-        return connection.query(`INSERT INTO products(name,variations, description, image) VALUES ('${name}', '${variations}', ${description}, '${image_name}')`, (error, result) => {
+        return connection.query(`INSERT INTO products(name,variations, description, image) VALUES ('${name}', '${variations}', '${description}', '${image_name}')`, (error, result) => {
             if (error) return response.error({
-                status: 500, data: { message: 'Кажется, что-то пошло не так, попробуйте позже', error }
+                status: 500, data: { message: 'Кажется, что-то пошло не так, попробуйте позже (1)', error }
             }, res);
             const { image } = req.files;
-            console.log("the image is:");
-            console.log(image);
+            // console.log("the image is:");
+            // console.log(image);
+            console.log("the req files are:");
             console.log(req.files);
-            FileService.save(image, 'products', image_name);
+            if(req.files.image) FileService.save(image, 'products', image_name);
             return response.success(null, res);
         });
     }

@@ -3,6 +3,8 @@ import { resolve } from "path";
 import * as fs from 'fs';
 class FileService {
     save(file, directory, name) {
+        // console.log("the file is");
+        // console.log(file);
         file.mv(resolve(`static/${directory}/`, name));
     }
     generateName(){

@@ -1,8 +1,6 @@
 import cors from "cors";
 import express from "express";
 import fileUpload from "express-fileupload";
-import formData from "express-form-data";
-import os from "os";
 // import product_router from "./product/product_router.js";
 // import category_router from "./category/category_router.js";
 
@@ -13,19 +11,17 @@ import PageRouter from "./Page/Router.js";
 import CategoryRouter from "./Category/Router.js";
 
 let app = express();
-app.use(express.json())
-    .use(express.static('static'))
-    .use(cors()).
-    use(body_parser.urlencoded({ extended: false }))
-    .use(formData.parse({
-        uploadDir: os.tmpdir(),
-        autoClean: true
-    }))
-    .use("/api", UserRouter)
-    .use("/api", ProductRouter)
-    .use("/api", PageRouter)
-    .use("/api", CategoryRouter)
-    .use(fileUpload())
+app.use(express.json());
+
+app.use(fileUpload({}));
+app.use(body_parser.urlencoded({ extended: false }));
+app.use(express.static('static'));
+app.use(cors());
+
+app.use("/api", UserRouter);
+app.use("/api", ProductRouter);
+app.use("/api", PageRouter);
+app.use("/api", CategoryRouter);
 
 
 const PORT = 5000;

@@ -3,25 +3,28 @@ import ProductController from "./ProductController.js";
 
 import { body } from 'express-validator';
 import validation from "../middleware/validation.js";
+import multer from "multer";
+const upload = multer({ dest: 'uploads/' })
 
 const router = new Router();
 
 
 router.post("/products/create",
-    // body('name').notEmpty().withMessage('Имя обязательно').bail().trim(),
-    // body('variations').notEmpty().withMessage('Вариации обязательны').bail()
-    //     .custom((value) => {
-    //         return new Promise((resolve, reject) => {
-    //             try {
-    //                 JSON.parse(value);
+    upload.single('image'),
+    body('name').notEmpty().withMessage('Имя обязательно').bail().trim(),
+    body('variations').notEmpty().withMessage('Вариации обязательны').bail()
+        .custom((value) => {
+            return new Promise((resolve, reject) => {
+                try {
+                    JSON.parse(value);
 
-    //                 resolve(true);
-    //             }
-    //             catch {
-    //                 reject(new Error('Не валидное поле вариаций'));
-    //             }
-    //         })
-    //     }).withMessage('Кажется, вариации невалидны'),
+                    resolve(true);
+                }
+                catch {
+                    reject(new Error('Не валидное поле вариаций'));
+                }
+            })
+        }).withMessage('Кажется, вариации невалидны'),
     validation, ProductController.create);
 router.get("/products", ProductController.getAll);
 router.get("/products/without-category", ProductController.getWithoutCategory);
