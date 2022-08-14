@@ -5,6 +5,10 @@ import FileService from '../FileService.js';
 
 class ProductController {
     async create(req, res) {
+
+        return response.success({ req: req.file }, res);
+
+
         const { name, variations, description = null } = req.body;
         const image_name = FileService.generateName();
         return connection.query(`INSERT INTO products(name,variations, description, image) VALUES ('${name}', '${variations}', '${description}', '${image_name}')`, (error, result) => {
@@ -16,7 +20,7 @@ class ProductController {
             // console.log(image);
             console.log("the req files are:");
             console.log(req.files);
-            if(req.files.image) FileService.save(image, 'products', image_name);
+            if (req.files.image) FileService.save(image, 'products', image_name);
             return response.success(null, res);
         });
     }
