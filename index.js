@@ -12,14 +12,18 @@ import ProductRouter from "./product/ProductRouter.js";
 
 
 const app = express();
-app.use(fileUpload({}));
-app.use(body_parser.urlencoded({extended: false}));
-app.use(express.json());
+app.use(express.static('static'));
+app.use(fileUpload({
+    createParentPath: true
+}));
 app.use(
     cors({
         origin: "http://localhost:3000",
     })
 );
+app.use(body_parser.json());
+app.use(body_parser.urlencoded({extended: true}));
+
 app.use("/api", ProductRouter);
 
 // app.use(express.static('static'));

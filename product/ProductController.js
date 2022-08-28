@@ -13,7 +13,7 @@ class ProductController {
             if (error) return response.error({
                 status: 500, data: {message: 'Кажется, что-то пошло не так, попробуйте позже (1)', error}
             }, res);
-            if (req.file) FileService.save(req.file, 'products', image_name);
+            if (req.files.image) FileService.save(req.files.image, 'products', image_name);
             return response.success(null, res);
         });
     }
