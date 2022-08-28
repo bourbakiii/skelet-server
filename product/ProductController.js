@@ -1,37 +1,31 @@
-import { response } from './../response.js';
-import { connection } from '../сonnection.js';
+import {response} from './../response.js';
+import {connection} from '../сonnection.js';
 import FileService from '../FileService.js';
 
 
 class ProductController {
     async create(req, res) {
-
-        return response.success({ req: req.file }, res);
-
-
-        const { name, variations, description = null } = req.body;
+        console.log("the req file is");
+        console.log(req.file);
+        const {name, variations, description = null} = req.body;
         const image_name = FileService.generateName();
         return connection.query(`INSERT INTO products(name,variations, description, image) VALUES ('${name}', '${variations}', '${description}', '${image_name}')`, (error, result) => {
             if (error) return response.error({
-                status: 500, data: { message: 'Кажется, что-то пошло не так, попробуйте позже (1)', error }
+                status: 500, data: {message: 'Кажется, что-то пошло не так, попробуйте позже (1)', error}
             }, res);
-            const { image } = req.files;
-            // console.log("the image is:");
-            // console.log(image);
-            console.log("the req files are:");
-            console.log(req.files);
-            if (req.files.image) FileService.save(image, 'products', image_name);
+            if (req.file) FileService.save(req.file, 'products', image_name);
             return response.success(null, res);
         });
     }
+
     async update(req, res) {
-        const { name, variations, description = null } = req.body;
+        const {name, variations, description = null} = req.body;
         const image_name = FileService.generateName();
         return connection.query(`UPDATE INTO products(name,variations, description, image) VALUES ('${name}', '${variations}', ${description}, '${image_name}')`, (error, result) => {
             if (error) return response.error({
-                status: 500, data: { message: 'Кажется, что-то пошло не так, попробуйте позже', error }
+                status: 500, data: {message: 'Кажется, что-то пошло не так, попробуйте позже', error}
             }, res);
-            const { image } = req.files;
+            const {image} = req.files;
             FileService.save(image, 'products', image_name);
             return response.success(null, res);
         });
@@ -40,19 +34,21 @@ class ProductController {
     async getAll(req, res) {
         return connection.query(`SELECT * FROM products`, (error, result) => {
             if (error) return response.error({
-                status: 500, data: { message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error }
+                status: 500, data: {message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error}
             }, res);
-            return response.success(result.map(el => Object.assign(el, { description: null })), res);
+            return response.success(result.map(el => Object.assign(el, {description: null})), res);
         });
     }
+
     async getWithoutCategory(req, res) {
         return connection.query(`SELECT * FROM products WHERE category_id = null`, (error, result) => {
             if (error) return response.error({
-                status: 500, data: { message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error }
+                status: 500, data: {message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error}
             }, res);
-            return response.success(result.map(el => Object.assign(el, { description: null })), res);
+            return response.success(result.map(el => Object.assign(el, {description: null})), res);
         });
     }
+
     async get(req, res) {
         if (!req.params.id) return response.validationErrors({
             validation_fields: {
@@ -62,9 +58,9 @@ class ProductController {
 
         return connection.query(`SELECT * FROM products WHERE id = ${req.params.id}`, (error, result) => {
             if (error) return response.error({
-                status: 500, data: { message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error }
+                status: 500, data: {message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error}
             }, res);
-            if (!result.length) return response.notFounded({ message: "Не удалось найти продукт" }, res);
+            if (!result.length) return response.notFounded({message: "Не удалось найти продукт"}, res);
             return response.success(result, res);
         });
     }
@@ -83,7 +79,7 @@ class ProductController {
 
         return connection.query(`UPDATE products SET ${keys} WHERE id = ${req.params.id}`, (error, result) => {
             if (error) return response.error({
-                status: 500, data: { message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error }
+                status: 500, data: {message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error}
             }, res);
             return response.success(null, res);
         });
@@ -102,7 +98,7 @@ class ProductController {
 
         return connection.query(`DELETE FROM products WHERE id = ${req.params.id}`, (error, result) => {
             if (error) return response.error({
-                status: 500, data: { message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error }
+                status: 500, data: {message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error}
             }, res);
             return response.success(null, res);
         });
@@ -111,7 +107,14 @@ class ProductController {
     async images(req, res) {
         // FileService.save(req.files["image"]);
         console.log(Object.keys(req));
-        response.success({ kill: Object.keys(req) }, res);
+        response.success({kill: Object.keys(req)}, res);
+    }
+
+    upload(req, res) {
+        console.log("the req,");
+        console.log(req.body)
+        console.log(req.files);
+        console.log(req.file);
     }
 }
 
