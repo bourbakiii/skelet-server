@@ -1,7 +1,7 @@
 import Router from "express";
 import ProductController from "./ProductController.js";
 
-import {body} from 'express-validator';
+import { body } from 'express-validator';
 import validation from "../middleware/validation.js";
 
 
@@ -27,6 +27,8 @@ router.post("/products/create",
     ProductController.create);
 router.get("/products", ProductController.getAll);
 router.get("/products/without-category", ProductController.getWithoutCategory);
+router.get("/products/search", ProductController.search);
+
 router.get("/products/:id", ProductController.get);
 router.patch("/products/:id", ProductController.update);
 router.delete("/products/:id", ProductController.delete);
