@@ -7,6 +7,7 @@ import body_parser from "body-parser";
 import ProductRouter from "./product/ProductRouter.js";
 import PageRouter from "./Page/Router.js";
 import CategoryRouter from "./Category/Router.js";
+import CompilationRouter from "./Compilation/Router.js";
 
 
 const app = express();
@@ -28,8 +29,9 @@ app.use("/api", ProductRouter);
 app.use("/api", UserRouter);
 app.use("/api", PageRouter);
 app.use("/api", CategoryRouter);
+app.use("/api", CompilationRouter);
 
 
-app.listen(5000, console.log("%сSERVER STARTED SUCCESSFULL 5000"));
+app.listen(5000, () => console.log("%сSERVER STARTED SUCCESSFULL 5000"));
 
 
