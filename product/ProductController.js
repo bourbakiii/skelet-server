@@ -6,10 +6,9 @@ import FileService from '../FileService.js';
 class ProductController {
 
     async search(req, res) {
-        const { keyword, category_id } = req.query;
-        console.log(123);
+        const { keyword = '', category_id, compilation_id } = req.query;
         return connection.query(`SELECT * FROM products WHERE
-            (name LIKE '%${keyword}%' ${category_id ? 'AND category_id = ' + category_id : ''})`, (error, result) => {
+            (name LIKE '%${keyword}%' ${category_id ? 'AND category_id = ' + category_id : ''} ${compilation_id ? 'AND compilation_id = ' + compilation_id : ''})`, (error, result) => {
             if (error) return response.error({
                 status: 500, data: { message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error }
             }, res);
