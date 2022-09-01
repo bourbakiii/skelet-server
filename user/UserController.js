@@ -19,7 +19,6 @@ const transporter = nodemailer.createTransport({
     }, secure: true,
 });
 
-const users = [{ id: 1, name: "Первый" }, { id: 2, name: "Второй" }]
 
 let alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
 
@@ -42,18 +41,21 @@ class UserController {
                 if (error) return response.error({
                     status: 500, data: { message: 'При хешировании возникла проблема, попробуйте позже', error }
                 }, res);
+                const generated_code = get_aphabet(5);
 
                 return await transporter.sendMail({
                     from: '"The Idea project" <veve111111@mail.ru>',
                     to: email,
-                    subject: "Ваш код для верификации на сайте-скелете:",
-                    html: `Ваш <i>код</i>:<h3>{место для кода}</h3>`,
+                    subject: "Ваш код для верификации:",
+                    html: `Ваш <i>код</i>:<h3>${generated_code}</h3>`,
                 }).then(() => {
-                    return connection.query(`INSERT INTO users(name,second_name,father_name,email, phone,password) VALUES ('${name}','${second_name}', '${father_name}', '${email}', '${phone}', '${hash}')`, (error, result) => {
+                    return connection.query(`INSERT INTO users(name,second_name,father_name,email, phone,password) VALUES ('${name}','${second_name}', '${father_name}', '${email}', '${phone}', '${hash}')`, async (error, { insertId }) => {
                         if (error) return response.error({
                             status: 500, data: { message: 'Кажется, что-то пошло не так, попробуйте позже', error }
                         }, res);
-                        return response.success(null, res)
+                        await connection.query(`INSERT INTO codes(user_id, code) VALUES ('${insertId}','${generated_code}')`, (error, result) => {
+                            return response.success(null, res)
+                        })
                     });
                 }).catch(error => {
                     return response.error({

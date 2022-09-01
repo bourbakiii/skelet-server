@@ -8,14 +8,13 @@ class ProductController {
     async search(req, res) {
         const { keyword = '', category_id, compilation_id } = req.query;
         return connection.query(`SELECT * FROM products WHERE
-            (name LIKE '%${keyword}%' ${category_id ? 'AND category_id = ' + category_id : ''} ${compilation_id ? 'AND compilation_id = ' + compilation_id : ''})`, (error, result) => {
+            (name LIKE '%${keyword}%' ${category_id ? 'AND category_id = ' + category_id : ''})`, (error, result) => {
             if (error) return response.error({
                 status: 500, data: { message: "Кажется, что-то пошло не так. Попробуйте позже", detail_error: error }
             }, res);
             return response.success(result.map(el => Object.assign(el, { description: null })), res);
         });
     }
-
 
 
     async create(req, res) {
