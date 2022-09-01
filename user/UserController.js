@@ -145,6 +145,9 @@ class UserController {
         });
     }
 
+    async changePassword(req, res) {
+        res.success(null, res);
+    }
 
     async login(req, res) {
         const {email, password} = req.body;
