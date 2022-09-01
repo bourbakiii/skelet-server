@@ -119,10 +119,28 @@ class UserController {
                 status: 404,
                 data: {message: "Пользователь не найден"}
             }, res);
-            return connection.query(`DELETE FROM codes WHERE (code = '${code}' AND user_id = ${result[0].id})`, (error, result) => {
-                console.log(error);
-                console.log('-------------------------------');
-                console.log(result)
+            return connection.query(`DELETE FROM codes WHERE (code = '${code}' AND user_id = ${result[0].id})`, (error, result_of_code) => {
+                if (error) return response.error({
+                    status: 500,
+                    data: {message: "При проверка кода возникла ошибка. Попробуйте позже", detail_error: error}
+                }, res);
+                if (result_of_code.affectedRows === 0) return response.error({
+                    status: 401,
+                    data: {message: "Код неверный"}
+                }, res);
+                else {
+                    return connection.query(`UPDATE users SET verify = 1 WHERE  id = ${result[0].id}`, (error, result_of_change_user) => {
+                        if (error) return response.error({
+                            status: 500,
+                            data: {
+                                message: "При верификации пользователя возникла ошибка. Попробуйте позже",
+                                detail_error: error
+                            }
+                        }, res);
+                        return response.success(null, res);
+                    });
+                }
+
             })
         });
     }
